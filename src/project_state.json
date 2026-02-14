@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Project to improve UI/visual design and reorganize displayed information into clear sections (MGO/ST, Farmer, Crop).",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-apply-a-more-attractive-consistent-visual-theme-across-the-app-loginpage-header-farmerform-settingsdialog-by-improving-typography-font-family-heading-hierarchy-spacing-and-refining-component-styling-while-staying-within-the-existing-tailwind-shadcn-ui-patterns-no-new-product-features",
+      "title": "Apply a more attractive, consistent visual theme across the app (LoginPage, Header, FarmerForm, SettingsDialog) by improving typography (font family, heading hierarchy, spacing) and refining component styling while staying within the existing Tailwind + shadcn/ui patterns (no new product features).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-reorganize-the-farmerform-ui-into-clearly-separated-sections-1-mgo-st-info-2-farmer-info-and-3-crop-info-each-section-must-have-a-visible-section-title-and-grouped-fields-without-changing-existing-validation-rules-or-submission-payload-content",
+      "title": "Reorganize the FarmerForm UI into clearly separated sections: (1) MGO/ST info, (2) Farmer info, and (3) Crop info. Each section must have a visible section title and grouped fields, without changing existing validation rules or submission payload content.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-the-farmerform-layout-responsiveness-by-using-a-structured-layout-e-g-stacked-on-mobile-multi-column-grid-on-larger-screens-within-each-section-to-reduce-vertical-scrolling-while-keeping-the-current-shadcn-ui-components-card-input-button-searchableselect-intact",
+      "title": "Improve the FarmerForm layout responsiveness by using a structured layout (e.g., stacked on mobile, multi-column grid on larger screens) within each section to reduce vertical scrolling while keeping the current shadcn/ui components (Card, Input, Button, SearchableSelect) intact.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Improve UI with more attractive design elements (e.g., better fonts, styling).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Reorganize information layout into separate sections: MGO/ST info, Farmer info, and Crop info.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Improve UI typography and reorganize the Farmer form into MGO/ST, Farmer, and Crop sections",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

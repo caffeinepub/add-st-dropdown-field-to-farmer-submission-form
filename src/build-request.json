@@ -1,0 +1,77 @@
+{
+  "kind": "build_request",
+  "title": "Improve UI typography and reorganize the Farmer form into MGO/ST, Farmer, and Crop sections",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Apply a more attractive, consistent visual theme across the app (LoginPage, Header, FarmerForm, SettingsDialog) by improving typography (font family, heading hierarchy, spacing) and refining component styling while staying within the existing Tailwind + shadcn/ui patterns (no new product features).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "Can we use more attractive user interface and design elements such as font,"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A new, coherent visual theme is applied consistently across main screens (login + main app).",
+        "Typography is noticeably improved: clearer heading sizes/weights, consistent label/body text sizing, and a modern font family applied globally.",
+        "No user-facing text is changed from non-English to non-English; keep all user-facing text in English.",
+        "No changes require backend updates; the app remains functional and form submission behavior is unchanged."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Reorganize the FarmerForm UI into clearly separated sections: (1) MGO/ST info, (2) Farmer info, and (3) Crop info. Each section must have a visible section title and grouped fields, without changing existing validation rules or submission payload content.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "also can we Divide MGO info ST etc in one section Farmer info in other and crop info in other"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The form renders three distinct, labeled sections: MGO/ST, Farmer, and Crop.",
+        "MGO/ST section contains: ST, MGO Headquarters (and keeps the existing dependency behavior: MGO Headquarters disabled until ST is selected).",
+        "Farmer section contains: Farmer Name, Mobile Number, Village, District, Taluka (and preserves district→taluka dependency behavior).",
+        "Crop section contains: Wheat Variety, Crop 1, Crop 2, Irrigation Type, Total Acreage.",
+        "Login ID remains read-only and visible (placement can be above sections), and the submit button still submits the same data successfully.",
+        "All existing validations and error messages still trigger appropriately for their fields."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Improve the FarmerForm layout responsiveness by using a structured layout (e.g., stacked on mobile, multi-column grid on larger screens) within each section to reduce vertical scrolling while keeping the current shadcn/ui components (Card, Input, Button, SearchableSelect) intact.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On small screens, fields remain easy to read and interact with (no cramped multi-column layout).",
+        "On larger screens, related fields are arranged to reduce excessive vertical whitespace (e.g., District/Taluka side-by-side where appropriate).",
+        "No input, select, or button becomes inaccessible or visually clipped at common breakpoints (mobile, tablet, desktop)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit files under frontend/src/components/ui (compose them instead).",
+    "Do not edit immutable frontend hook files: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
+    "Keep the backend as-is (single-actor Motoko); no schema/state migrations are required for UI-only changes.",
+    "Do not change the Google Apps Script URL locking behavior or any existing submission payload behavior."
+  ],
+  "nonGoals": [
+    "Adding new backend endpoints or changing backend authorization/profile logic.",
+    "Adding new data fields to the farmer submission payload or changing the Google Sheets column/order semantics.",
+    "Implementing RecordsList/Leaderboard/Analytics features (currently placeholders)."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

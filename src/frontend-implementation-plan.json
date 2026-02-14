@@ -1,0 +1,89 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "UI typography refresh and FarmerForm sectioned responsive layout",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Apply a consistent, more modern typographic theme and refine styling across LoginPage, Header, FarmerForm, and SettingsDialog without changing behavior.",
+      "acceptanceCriteria": [
+        "A new, coherent visual theme is applied consistently across main screens (login + main app).",
+        "Typography is noticeably improved: clearer heading sizes/weights, consistent label/body text sizing, and a modern font family applied globally.",
+        "No user-facing text is changed from non-English to non-English; keep all user-facing text in English.",
+        "No changes require backend updates; the app remains functional and form submission behavior is unchanged."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Add a modern, globally applied font (e.g., via a hosted font link) and any needed preconnects so the app uses a consistent font family throughout. Keep existing app bootstrapping intact."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Update global typography defaults: set the new font-family on body, tune base text rendering, and standardize heading/label/body sizing using Tailwind base layer conventions (no new features)."
+        },
+        {
+          "path": "frontend/src/pages/LoginPage.tsx",
+          "operation": "modify",
+          "description": "Refine LoginPage typography and spacing (heading hierarchy, label/body consistency, subtle card spacing) while continuing to compose existing shadcn/ui components (Card, Input, Button). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Refine Header typography (brand title/subtitle hierarchy, badge sizing, spacing) and ensure consistent contrast and alignment while continuing to compose existing shadcn/ui components (Button, Badge). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/FarmerForm.tsx",
+          "operation": "modify",
+          "description": "Align FarmerForm typography with the global theme (section headings, labels, helper text, error text spacing) while keeping all validations, dependencies, and submission behavior unchanged and continuing to use existing shadcn/ui components (Card, Input, Button) plus the existing SearchableSelect. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/SettingsDialog.tsx",
+          "operation": "modify",
+          "description": "Refine SettingsDialog typography and spacing (dialog title/description hierarchy, alert text sizing, list readability) while continuing to compose existing shadcn/ui components (Dialog, Alert, Button, Label). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Adjust Footer typography and spacing to match the refreshed theme (consistent muted text sizing/leading) without changing content or links."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Restructure FarmerForm into three labeled sections (MGO/ST, Farmer, Crop) with the same validations, dependencies, and submission payload.",
+      "acceptanceCriteria": [
+        "The form renders three distinct, labeled sections: MGO/ST, Farmer, and Crop.",
+        "MGO/ST section contains: ST, MGO Headquarters (and keeps the existing dependency behavior: MGO Headquarters disabled until ST is selected).",
+        "Farmer section contains: Farmer Name, Mobile Number, Village, District, Taluka (and preserves district→taluka dependency behavior).",
+        "Crop section contains: Wheat Variety, Crop 1, Crop 2, Irrigation Type, Total Acreage.",
+        "Login ID remains read-only and visible (placement can be above sections), and the submit button still submits the same data successfully.",
+        "All existing validations and error messages still trigger appropriately for their fields."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/FarmerForm.tsx",
+          "operation": "modify",
+          "description": "Reorganize the FarmerForm JSX into three visually separated groups with clear section titles: (1) MGO/ST info, (2) Farmer info, (3) Crop info. Keep Login ID read-only and visible above sections. Preserve ST→MGO HQ and District→Taluka dependency behavior, and do not alter validation rules or the submission payload. Continue composing existing shadcn/ui components (Card, Input, Button) and the existing SearchableSelect. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Improve FarmerForm responsiveness using section-level structured layouts (stacked on mobile, multi-column on larger screens) while keeping existing shadcn/ui components intact.",
+      "acceptanceCriteria": [
+        "On small screens, fields remain easy to read and interact with (no cramped multi-column layout).",
+        "On larger screens, related fields are arranged to reduce excessive vertical whitespace (e.g., District/Taluka side-by-side where appropriate).",
+        "No input, select, or button becomes inaccessible or visually clipped at common breakpoints (mobile, tablet, desktop)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/FarmerForm.tsx",
+          "operation": "modify",
+          "description": "Within each of the three sections, apply a responsive Tailwind layout (e.g., single-column on small screens and 2-column grid on md+ where appropriate) to reduce scrolling. Ensure dependent selects (MGO HQ, Taluka) remain usable, and keep all shadcn/ui components (Card, Input, Button) and SearchableSelect intact (compose only; do not edit ui components). Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

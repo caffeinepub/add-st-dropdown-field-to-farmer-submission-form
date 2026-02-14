@@ -1,0 +1,71 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-apply-a-more-attractive-consistent-visual-theme-across-the-app-loginpage-header-farmerform-settingsdialog-by-improving-typography-font-family-heading-hierarchy-spacing-and-refining-component-styling-while-staying-within-the-existing-tailwind-shadcn-ui-patterns-no-new-product-features",
+      "featureTitle": "Apply a more attractive, consistent visual theme across the app (LoginPage, Header, FarmerForm, SettingsDialog) by improving typography (font family, heading hierarchy, spacing) and refining component styling while staying within the existing Tailwind + shadcn/ui patterns (no new product features).",
+      "files": [
+        "frontend/index.html",
+        "frontend/src/components/FarmerForm.tsx",
+        "frontend/src/components/Footer.tsx",
+        "frontend/src/components/Header.tsx",
+        "frontend/src/components/SettingsDialog.tsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/LoginPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "http-outcalls@3.0.0",
+        "authorization@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-reorganize-the-farmerform-ui-into-clearly-separated-sections-1-mgo-st-info-2-farmer-info-and-3-crop-info-each-section-must-have-a-visible-section-title-and-grouped-fields-without-changing-existing-validation-rules-or-submission-payload-content",
+      "featureTitle": "Reorganize the FarmerForm UI into clearly separated sections: (1) MGO/ST info, (2) Farmer info, and (3) Crop info. Each section must have a visible section title and grouped fields, without changing existing validation rules or submission payload content.",
+      "files": [
+        "frontend/src/components/FarmerForm.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "http-outcalls@3.0.0",
+        "authorization@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-improve-the-farmerform-layout-responsiveness-by-using-a-structured-layout-e-g-stacked-on-mobile-multi-column-grid-on-larger-screens-within-each-section-to-reduce-vertical-scrolling-while-keeping-the-current-shadcn-ui-components-card-input-button-searchableselect-intact",
+      "featureTitle": "Improve the FarmerForm layout responsiveness by using a structured layout (e.g., stacked on mobile, multi-column grid on larger screens) within each section to reduce vertical scrolling while keeping the current shadcn/ui components (Card, Input, Button, SearchableSelect) intact.",
+      "files": [
+        "frontend/src/components/FarmerForm.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "http-outcalls@3.0.0",
+        "authorization@4.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-14T17:30:19.656Z",
+  "summary": "REQ-1/2/3 appear largely addressed via global typography/theme updates (index.css, tailwind fonts, LoginPage/Header/SettingsDialog styling) and FarmerForm restructuring (per diff summary and file summaries). However, the diff summary indicates several unrequested product features and at least one change that likely violates the constraint to keep submission payload behavior unchanged.",
+  "missing_requirements": [],
+  "hallucinated_features": [
+    {
+      "description": "Implemented RecordsList functionality including export to CSV and record deletion with confirmation dialog (explicitly listed as a non-goal/placeholder).",
+      "reason": "BuildRequest explicitly states RecordsList/Leaderboard/Analytics features are non-goals and should not be implemented.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions \"frontend/src/components/RecordsList.tsx\": export to CSV + deletion)"
+      ]
+    },
+    {
+      "description": "Implemented Leaderboard component ranking users by submission count, highlighting current user, refresh, etc. (explicitly listed as a non-goal/placeholder).",
+      "reason": "BuildRequest explicitly states Leaderboard is a non-goal/placeholder and should not be implemented.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions \"frontend/src/components/Leaderboard.tsx\": ranked list, refresh, highlighting)"
+      ]
+    },
+    {
+      "description": "Implemented/expanded Analytics dashboard with retry logic, error categorization, and charts, and references an \"updated Google Apps Script URL\" (explicitly listed as a non-goal/placeholder).",
+      "reason": "BuildRequest explicitly states Analytics features are non-goals/placeholders and also constrains not to change Google Apps Script URL locking behavior.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions \"frontend/src/components/Analytics.tsx\": charts, retry logic, and \"updated Google Apps Script URL\")"
+      ]
+    },
+    {
+      "description": "Changed farmer submission payload key mapping in query hook (\"ST\", \"MGOHQ\", \"WheatVariety\"), which likely alters existing submission payload behavior.",
+      "reason": "BuildRequest constraint: \"Do not change the Google Apps Script URL locking behavior or any existing submission payload behavior.\" Payload key remapping is a behavioral change.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions \"frontend/src/hooks/useQueries.ts\": payload keys now correctly mapped as \"ST\", \"MGOHQ\", and \"WheatVariety\")"
+      ]
+    },
+    {
+      "description": "Modified SearchableSelect component internals (type-ahead filtering, scrollable list, mobile touch interactions) rather than only composing it.",
+      "reason": "BuildRequest did not request SearchableSelect feature work; additionally, constraints emphasized composing existing ui components rather than editing them (while SearchableSelect is not under ui/, this is still unrequested functionality change).",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions \"frontend/src/components/SearchableSelect.tsx\": type-ahead filtering, scrollable list, mobile interactions)"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/index.html",
+    "frontend/src/components/FarmerForm.tsx",
+    "frontend/src/components/Footer.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/SettingsDialog.tsx",
+    "frontend/src/index.css",
+    "frontend/src/pages/LoginPage.tsx",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}

@@ -1,2 +1,3 @@
-# add-st-dropdown-field-to-farmer-submission-form
-Exported from Caffeine project: Improve UI typography and reorganize the Farmer form into MGO/ST, Farmer, and Crop sections
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`
