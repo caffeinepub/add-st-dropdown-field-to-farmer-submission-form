@@ -75,7 +75,7 @@ export default function FarmerForm({
       await submitFarmerData.mutateAsync({
         farmerName: data.farmerName.trim(),
         mobileNumber: data.mobileNumber.trim(),
-        village: data.village?.trim() || null,
+        village: data.village.trim(),
         district: data.district || "",
         taluka: data.taluka || "",
         st: lockedST,
@@ -265,7 +265,7 @@ export default function FarmerForm({
                   htmlFor="village"
                   className="text-sm font-semibold text-slate-700"
                 >
-                  Village
+                  Village <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   data-ocid="form.village.input"
@@ -273,8 +273,20 @@ export default function FarmerForm({
                   type="text"
                   placeholder="Enter village name"
                   className="h-11 border-slate-300 focus:border-cyan-500 focus:ring-cyan-500"
-                  {...register("village")}
+                  {...register("village", {
+                    required: "Village name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Village name must be at least 2 characters",
+                    },
+                  })}
                 />
+                {errors.village && (
+                  <p className="text-sm text-red-600 flex items-center gap-1.5">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.village.message}
+                  </p>
+                )}
               </div>
 
               {/* District */}
@@ -348,7 +360,7 @@ export default function FarmerForm({
                   htmlFor="wheatVariety"
                   className="text-sm font-semibold text-slate-700"
                 >
-                  Wheat Variety
+                  Wheat Variety <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   data-ocid="form.wheatvariety.input"
@@ -356,8 +368,20 @@ export default function FarmerForm({
                   type="text"
                   placeholder="Enter wheat variety"
                   className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                  {...register("wheatVariety")}
+                  {...register("wheatVariety", {
+                    required: "Wheat variety is required",
+                    minLength: {
+                      value: 2,
+                      message: "Wheat variety must be at least 2 characters",
+                    },
+                  })}
                 />
+                {errors.wheatVariety && (
+                  <p className="text-sm text-red-600 flex items-center gap-1.5">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.wheatVariety.message}
+                  </p>
+                )}
               </div>
 
               {/* Crop 1 */}
