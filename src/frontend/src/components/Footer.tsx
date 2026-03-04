@@ -1,4 +1,4 @@
-import { Smartphone, FileSpreadsheet, Heart } from 'lucide-react';
+import { FileSpreadsheet, Heart, Smartphone } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -16,7 +16,8 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center text-xs text-slate-500">
-          © {new Date().getFullYear()}. Built with <Heart className="w-3 h-3 inline text-red-500 fill-red-500" /> using{' '}
+          © {new Date().getFullYear()}. Built with{" "}
+          <Heart className="w-3 h-3 inline text-red-500 fill-red-500" /> using{" "}
           <a
             href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
             target="_blank"

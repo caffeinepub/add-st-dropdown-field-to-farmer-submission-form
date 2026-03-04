@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SearchableSelect } from '@/components/SearchableSelect';
-import { DISTRICTS, TALUKAS, CROPS, IRRIGATION_TYPES } from '../lib/constants';
-import { useSubmitFarmerData, useIncrementSubmissionCount } from '../hooks/useQueries';
+import { SearchableSelect } from "@/components/SearchableSelect";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, CheckCircle2, Loader2, Lock } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useSubmitFarmerData } from "../hooks/useQueries";
+import { CROPS, DISTRICTS, IRRIGATION_TYPES, TALUKAS } from "../lib/constants";
 
 interface FarmerFormData {
   farmerName: string;
@@ -16,8 +16,6 @@ interface FarmerFormData {
   village: string;
   district: string;
   taluka: string;
-  st: string;
-  mgoHeadquarters: string;
   wheatVariety: string;
   crop1: string;
   crop2: string;
@@ -28,20 +26,15 @@ interface FarmerFormData {
 interface FarmerFormProps {
   loginId: string;
   userName: string;
+  lockedST: string;
+  lockedMGOHQ: string;
 }
 
-const ST_OPTIONS = ['Ahilyanagar', 'Pune', 'Nashik', 'Solapur', 'Sangli'];
-
-// MGO Headquarters mapping based on ST
-const MGO_HEADQUARTERS_MAP: Record<string, string[]> = {
-  'Ahilyanagar': ['Shrigondha', 'Tisgaon', 'Shrirampur', 'Shevgaon'],
-  'Pune': ['Indapur', 'Nira', 'Narayangaon', 'Rajguru Nagar'],
-  'Nashik': ['Chandwad', 'Pimplegaon', 'Ozar', 'Niphad'],
-  'Solapur': ['Malshiras', 'Jeur', 'Sangola'],
-  'Sangli': ['Kawthemahakal'],
-};
-
-export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
+export default function FarmerForm({
+  loginId,
+  lockedST,
+  lockedMGOHQ,
+}: FarmerFormProps) {
   const {
     register,
     handleSubmit,
@@ -51,79 +44,62 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
     watch,
   } = useForm<FarmerFormData>({
     defaultValues: {
-      farmerName: '',
-      mobileNumber: '',
-      village: '',
-      district: '',
-      taluka: '',
-      st: '',
-      mgoHeadquarters: '',
-      wheatVariety: '',
-      crop1: '',
-      crop2: '',
-      irrigationType: '',
-      totalAcreage: '',
+      farmerName: "",
+      mobileNumber: "",
+      village: "",
+      district: "",
+      taluka: "",
+      wheatVariety: "",
+      crop1: "",
+      crop2: "",
+      irrigationType: "",
+      totalAcreage: "",
     },
   });
 
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  const [_selectedDistrict, setSelectedDistrict] = useState<string>("");
   const submitFarmerData = useSubmitFarmerData(loginId);
-  const incrementSubmissionCount = useIncrementSubmissionCount(loginId);
 
-  const district = watch('district');
-  const taluka = watch('taluka');
-  const st = watch('st');
-  const mgoHeadquarters = watch('mgoHeadquarters');
-  const crop1 = watch('crop1');
-  const crop2 = watch('crop2');
-  const irrigationType = watch('irrigationType');
-  
+  const district = watch("district");
+  const taluka = watch("taluka");
+  const crop1 = watch("crop1");
+  const crop2 = watch("crop2");
+  const irrigationType = watch("irrigationType");
+
   const availableTalukas = district ? TALUKAS[district] || [] : [];
-  const availableMgoHeadquarters = st ? MGO_HEADQUARTERS_MAP[st] || [] : [];
-
-  // Clear MGO Headquarters when ST changes
-  useEffect(() => {
-    if (st) {
-      setValue('mgoHeadquarters', '');
-    }
-  }, [st, setValue]);
 
   const onSubmit = async (data: FarmerFormData) => {
     try {
-      const totalAcreage = parseFloat(data.totalAcreage);
-      
-      // Submit data with the manually entered farmer name from the form
+      const totalAcreage = Number.parseFloat(data.totalAcreage);
+
       await submitFarmerData.mutateAsync({
         farmerName: data.farmerName.trim(),
         mobileNumber: data.mobileNumber.trim(),
         village: data.village?.trim() || null,
-        district: data.district || '',
-        taluka: data.taluka || '',
-        st: data.st || '',
-        mgoHeadquarters: data.mgoHeadquarters || '',
-        wheatVariety: data.wheatVariety?.trim() || '',
-        crop1: data.crop1 || '',
+        district: data.district || "",
+        taluka: data.taluka || "",
+        st: lockedST,
+        mgoHeadquarters: lockedMGOHQ,
+        wheatVariety: data.wheatVariety?.trim() || "",
+        crop1: data.crop1 || "",
         crop2: data.crop2 || null,
-        irrigationType: data.irrigationType || '',
+        irrigationType: data.irrigationType || "",
         totalAcreage: totalAcreage,
       });
 
-      // Increment local submission count
-      incrementSubmissionCount();
-
-      // Display exact success message as specified
-      toast.success('Data Submitted Successfully', {
-        description: 'Farmer data has been saved to Google Sheets',
+      toast.success("Data Submitted Successfully", {
+        description: "Farmer data has been saved to Google Sheets",
         icon: <CheckCircle2 className="w-5 h-5 text-teal-600" />,
       });
 
-      // Reset form
       reset();
-      setSelectedDistrict('');
+      setSelectedDistrict("");
     } catch (error: any) {
-      console.error('Submission error:', error);
-      toast.error('Submission Failed', {
-        description: error.message || 'Unable to submit data. Please check your connection and try again.',
+      console.error("Submission error:", error);
+      toast.error("Submission Failed", {
+        description:
+          error.message ||
+          "Unable to submit data. Please check your connection and try again.",
         icon: <AlertCircle className="w-5 h-5" />,
       });
     }
@@ -136,14 +112,18 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
           Farmer Data Entry
         </CardTitle>
         <p className="text-sm text-slate-600 mt-2">
-          Fill in the farmer information below. All fields marked with <span className="text-red-500">*</span> are required.
+          Fill in the farmer information below. All fields marked with{" "}
+          <span className="text-red-500">*</span> are required.
         </p>
       </CardHeader>
       <CardContent className="p-6 sm:p-8">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Login ID - Read Only */}
           <div className="space-y-2.5">
-            <Label htmlFor="loginId" className="text-sm font-semibold text-slate-700">
+            <Label
+              htmlFor="loginId"
+              className="text-sm font-semibold text-slate-700"
+            >
               Login ID
             </Label>
             <Input
@@ -155,82 +135,90 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
             />
           </div>
 
-          {/* Section 1: MGO/ST Information */}
+          {/* Section 1: MGO/ST Information — Locked */}
           <div className="space-y-5">
             <div className="flex items-center gap-3 pb-2 border-b-2 border-teal-600">
-              <div className="w-1.5 h-6 bg-teal-600 rounded-full"></div>
+              <div className="w-1.5 h-6 bg-teal-600 rounded-full" />
               <h3 className="text-lg sm:text-xl font-display font-semibold text-slate-900">
                 MGO / ST Information
               </h3>
+              <span className="ml-auto flex items-center gap-1 text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+                <Lock className="w-3 h-3" />
+                Locked
+              </span>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* ST */}
+              {/* ST — locked */}
               <div className="space-y-2.5">
-                <Label htmlFor="st" className="text-sm font-semibold text-slate-700">
-                  ST <span className="text-red-500">*</span>
+                <Label className="text-sm font-semibold text-slate-700">
+                  ST
                 </Label>
-                <SearchableSelect
-                  options={ST_OPTIONS}
-                  value={st}
-                  onValueChange={(value) => setValue('st', value)}
-                  placeholder="Select ST"
-                  emptyMessage="No ST found"
-                />
-                {errors.st && (
-                  <p className="text-sm text-red-600 flex items-center gap-1.5">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.st.message}
-                  </p>
-                )}
+                <div className="relative">
+                  <Input
+                    type="text"
+                    value={lockedST}
+                    disabled
+                    className="h-11 bg-slate-50 text-slate-700 border-slate-200 cursor-not-allowed font-medium pr-10"
+                  />
+                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                </div>
               </div>
 
-              {/* MGO Headquarters */}
+              {/* MGO Headquarters — locked */}
               <div className="space-y-2.5">
-                <Label htmlFor="mgoHeadquarters" className="text-sm font-semibold text-slate-700">
-                  MGO Headquarters <span className="text-red-500">*</span>
+                <Label className="text-sm font-semibold text-slate-700">
+                  MGO Headquarters
                 </Label>
-                <SearchableSelect
-                  options={availableMgoHeadquarters}
-                  value={mgoHeadquarters}
-                  onValueChange={(value) => setValue('mgoHeadquarters', value)}
-                  placeholder={st ? "Select MGO Headquarters" : "Select ST first"}
-                  emptyMessage="No MGO Headquarters found"
-                  disabled={!st}
-                />
-                {errors.mgoHeadquarters && (
-                  <p className="text-sm text-red-600 flex items-center gap-1.5">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.mgoHeadquarters.message}
-                  </p>
-                )}
+                <div className="relative">
+                  <Input
+                    type="text"
+                    value={lockedMGOHQ}
+                    disabled
+                    className="h-11 bg-slate-50 text-slate-700 border-slate-200 cursor-not-allowed font-medium pr-10"
+                  />
+                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                </div>
               </div>
             </div>
+
+            <p className="text-xs text-slate-500 flex items-center gap-1.5">
+              <Lock className="w-3 h-3" />
+              ST and MGO Headquarters are set at login and cannot be changed
+              during this session.
+            </p>
           </div>
 
           {/* Section 2: Farmer Information */}
           <div className="space-y-5">
             <div className="flex items-center gap-3 pb-2 border-b-2 border-cyan-600">
-              <div className="w-1.5 h-6 bg-cyan-600 rounded-full"></div>
+              <div className="w-1.5 h-6 bg-cyan-600 rounded-full" />
               <h3 className="text-lg sm:text-xl font-display font-semibold text-slate-900">
                 Farmer Information
               </h3>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Farmer Name */}
               <div className="space-y-2.5">
-                <Label htmlFor="farmerName" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="farmerName"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Farmer Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
+                  data-ocid="form.farmername.input"
                   id="farmerName"
                   type="text"
                   placeholder="Enter farmer's full name"
                   className="h-11 border-slate-300 focus:border-cyan-500 focus:ring-cyan-500"
-                  {...register('farmerName', {
-                    required: 'Farmer name is required',
-                    minLength: { value: 2, message: 'Name must be at least 2 characters' },
+                  {...register("farmerName", {
+                    required: "Farmer name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
                   })}
                 />
                 {errors.farmerName && (
@@ -243,19 +231,23 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
 
               {/* Mobile Number */}
               <div className="space-y-2.5">
-                <Label htmlFor="mobileNumber" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="mobileNumber"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Mobile Number <span className="text-red-500">*</span>
                 </Label>
                 <Input
+                  data-ocid="form.mobilenumber.input"
                   id="mobileNumber"
                   type="tel"
                   placeholder="Enter 10-digit mobile number"
                   className="h-11 border-slate-300 focus:border-cyan-500 focus:ring-cyan-500"
-                  {...register('mobileNumber', {
-                    required: 'Mobile number is required',
+                  {...register("mobileNumber", {
+                    required: "Mobile number is required",
                     pattern: {
                       value: /^[0-9]{10}$/,
-                      message: 'Please enter a valid 10-digit mobile number',
+                      message: "Please enter a valid 10-digit mobile number",
                     },
                   })}
                 />
@@ -269,29 +261,36 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
 
               {/* Village */}
               <div className="space-y-2.5">
-                <Label htmlFor="village" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="village"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Village
                 </Label>
                 <Input
+                  data-ocid="form.village.input"
                   id="village"
                   type="text"
                   placeholder="Enter village name"
                   className="h-11 border-slate-300 focus:border-cyan-500 focus:ring-cyan-500"
-                  {...register('village')}
+                  {...register("village")}
                 />
               </div>
 
               {/* District */}
               <div className="space-y-2.5">
-                <Label htmlFor="district" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="district"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   District <span className="text-red-500">*</span>
                 </Label>
                 <SearchableSelect
                   options={DISTRICTS}
                   value={district}
                   onValueChange={(value) => {
-                    setValue('district', value);
-                    setValue('taluka', '');
+                    setValue("district", value);
+                    setValue("taluka", "");
                     setSelectedDistrict(value);
                   }}
                   placeholder="Select district"
@@ -307,14 +306,19 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
 
               {/* Taluka */}
               <div className="space-y-2.5 md:col-span-2">
-                <Label htmlFor="taluka" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="taluka"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Taluka <span className="text-red-500">*</span>
                 </Label>
                 <SearchableSelect
                   options={availableTalukas}
                   value={taluka}
-                  onValueChange={(value) => setValue('taluka', value)}
-                  placeholder={district ? "Select taluka" : "Select district first"}
+                  onValueChange={(value) => setValue("taluka", value)}
+                  placeholder={
+                    district ? "Select taluka" : "Select district first"
+                  }
                   emptyMessage="No taluka found"
                   disabled={!district}
                 />
@@ -331,36 +335,43 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
           {/* Section 3: Crop Information */}
           <div className="space-y-5">
             <div className="flex items-center gap-3 pb-2 border-b-2 border-blue-600">
-              <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+              <div className="w-1.5 h-6 bg-blue-600 rounded-full" />
               <h3 className="text-lg sm:text-xl font-display font-semibold text-slate-900">
                 Crop Information
               </h3>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Wheat Variety */}
               <div className="space-y-2.5">
-                <Label htmlFor="wheatVariety" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="wheatVariety"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Wheat Variety
                 </Label>
                 <Input
+                  data-ocid="form.wheatvariety.input"
                   id="wheatVariety"
                   type="text"
                   placeholder="Enter wheat variety"
                   className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                  {...register('wheatVariety')}
+                  {...register("wheatVariety")}
                 />
               </div>
 
               {/* Crop 1 */}
               <div className="space-y-2.5">
-                <Label htmlFor="crop1" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="crop1"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Crop 1 <span className="text-red-500">*</span>
                 </Label>
                 <SearchableSelect
                   options={CROPS}
                   value={crop1}
-                  onValueChange={(value) => setValue('crop1', value)}
+                  onValueChange={(value) => setValue("crop1", value)}
                   placeholder="Select primary crop"
                   emptyMessage="No crop found"
                 />
@@ -374,13 +385,16 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
 
               {/* Crop 2 */}
               <div className="space-y-2.5">
-                <Label htmlFor="crop2" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="crop2"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Crop 2
                 </Label>
                 <SearchableSelect
                   options={CROPS}
                   value={crop2}
-                  onValueChange={(value) => setValue('crop2', value)}
+                  onValueChange={(value) => setValue("crop2", value)}
                   placeholder="Select secondary crop (optional)"
                   emptyMessage="No crop found"
                 />
@@ -388,13 +402,16 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
 
               {/* Irrigation Type */}
               <div className="space-y-2.5">
-                <Label htmlFor="irrigationType" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="irrigationType"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Irrigation Type <span className="text-red-500">*</span>
                 </Label>
                 <SearchableSelect
                   options={IRRIGATION_TYPES}
                   value={irrigationType}
-                  onValueChange={(value) => setValue('irrigationType', value)}
+                  onValueChange={(value) => setValue("irrigationType", value)}
                   placeholder="Select irrigation type"
                   emptyMessage="No irrigation type found"
                 />
@@ -408,18 +425,25 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
 
               {/* Total Acreage */}
               <div className="space-y-2.5 md:col-span-2">
-                <Label htmlFor="totalAcreage" className="text-sm font-semibold text-slate-700">
+                <Label
+                  htmlFor="totalAcreage"
+                  className="text-sm font-semibold text-slate-700"
+                >
                   Total Acreage <span className="text-red-500">*</span>
                 </Label>
                 <Input
+                  data-ocid="form.totalacreage.input"
                   id="totalAcreage"
                   type="number"
                   step="0.01"
                   placeholder="Enter total acreage (e.g., 5.5)"
                   className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-                  {...register('totalAcreage', {
-                    required: 'Total acreage is required',
-                    min: { value: 0.01, message: 'Acreage must be greater than 0' },
+                  {...register("totalAcreage", {
+                    required: "Total acreage is required",
+                    min: {
+                      value: 0.01,
+                      message: "Acreage must be greater than 0",
+                    },
                   })}
                 />
                 {errors.totalAcreage && (
@@ -435,6 +459,7 @@ export default function FarmerForm({ loginId, userName }: FarmerFormProps) {
           {/* Submit Button */}
           <div className="pt-4">
             <Button
+              data-ocid="form.submit_button"
               type="submit"
               disabled={submitFarmerData.isPending}
               className="w-full h-12 text-base font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 shadow-md transition-all duration-200 hover:shadow-lg disabled:opacity-50"

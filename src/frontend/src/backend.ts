@@ -114,9 +114,27 @@ export interface FarmerSubmission {
     responsesArray?: Array<string>;
     oldRandomArray?: Array<bigint>;
 }
+export interface http_request_result {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
+export interface TransformationOutput {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
+export interface TransformationInput {
+    context: Uint8Array;
+    response: http_request_result;
+}
 export interface UserProfile {
     name: string;
     loginId: string;
+}
+export interface http_header {
+    value: string;
+    name: string;
 }
 export enum UserRole {
     admin = "admin",
@@ -130,12 +148,15 @@ export interface backendInterface {
     getAllSubmissions(): Promise<Array<FarmerSubmission>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getLeaderboard(): Promise<string>;
     getSubmission(submissionId: bigint): Promise<FarmerSubmission | null>;
+    getSubmissionCount(loginId: string): Promise<string>;
     getSubmissionsByDevice(deviceId: string): Promise<Array<FarmerSubmission>>;
     getSubmissionsByFarmer(farmerId: string): Promise<Array<FarmerSubmission>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    transform(input: TransformationInput): Promise<TransformationOutput>;
 }
 import type { FarmerSubmission as _FarmerSubmission, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -224,6 +245,20 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n13(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getLeaderboard(): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getLeaderboard();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getLeaderboard();
+            return result;
+        }
+    }
     async getSubmission(arg0: bigint): Promise<FarmerSubmission | null> {
         if (this.processError) {
             try {
@@ -236,6 +271,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getSubmission(arg0);
             return from_candid_opt_n15(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getSubmissionCount(arg0: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getSubmissionCount(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getSubmissionCount(arg0);
+            return result;
         }
     }
     async getSubmissionsByDevice(arg0: string): Promise<Array<FarmerSubmission>> {
@@ -305,6 +354,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveCallerUserProfile(arg0);
+            return result;
+        }
+    }
+    async transform(arg0: TransformationInput): Promise<TransformationOutput> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.transform(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.transform(arg0);
             return result;
         }
     }

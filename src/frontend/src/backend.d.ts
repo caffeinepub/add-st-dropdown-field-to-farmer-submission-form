@@ -32,9 +32,27 @@ export interface FarmerSubmission {
     responsesArray?: Array<string>;
     oldRandomArray?: Array<bigint>;
 }
+export interface http_request_result {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
+export interface TransformationOutput {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
+export interface TransformationInput {
+    context: Uint8Array;
+    response: http_request_result;
+}
 export interface UserProfile {
     name: string;
     loginId: string;
+}
+export interface http_header {
+    value: string;
+    name: string;
 }
 export enum UserRole {
     admin = "admin",
@@ -47,10 +65,13 @@ export interface backendInterface {
     getAllSubmissions(): Promise<Array<FarmerSubmission>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getLeaderboard(): Promise<string>;
     getSubmission(submissionId: bigint): Promise<FarmerSubmission | null>;
+    getSubmissionCount(loginId: string): Promise<string>;
     getSubmissionsByDevice(deviceId: string): Promise<Array<FarmerSubmission>>;
     getSubmissionsByFarmer(farmerId: string): Promise<Array<FarmerSubmission>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    transform(input: TransformationInput): Promise<TransformationOutput>;
 }

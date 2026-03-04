@@ -1,12 +1,11 @@
+import OutCall "http-outcalls/outcall";
 import Runtime "mo:core/Runtime";
 import Nat "mo:core/Nat";
 import AccessControl "authorization/access-control";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
-import MixinAuthorization "authorization/MixinAuthorization";
 import Map "mo:core/Map";
-
-
+import MixinAuthorization "authorization/MixinAuthorization";
 
 actor {
   // Secure user authentication and authorization
@@ -70,6 +69,14 @@ actor {
     pictureId : Text;
   };
 
+  public type LeaderboardEntry = {
+    name : Text;
+    loginId : Text;
+    totalSTMileage : Nat;
+    entryCount : Nat;
+    rank : Nat;
+  };
+
   // Farmer submission management
   let submissions = Map.empty<Nat, FarmerSubmission>();
 
@@ -117,5 +124,50 @@ actor {
       func(submission) { submission.deviceId == deviceId }
     );
     filteredIter.toArray();
+  };
+
+  // HTTP transformation callback for GET requests.
+  // Required for compatibility with the HTTP outcall component.
+  public query ({}) func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
+    OutCall.transform(input);
+  };
+
+  // CORS-safe leaderboard retrieval through HTTP outcall component.
+  // Public leaderboard accessible to all users including guests
+  public shared ({ caller }) func getLeaderboard() : async Text {
+    await OutCall.httpGetRequest(
+      "https://script.google.com/macros/s/AKfycbzAJ7wor5EMwHzCGrmn7iuk8ncoEinKD24BaP9HibvRHH-jF1w1yoReUZXcTQKkPr96fA/exec?sheetType=leaderboard",
+      [],
+      transform,
+    );
+  };
+
+  // Outcall to get submission count for a specific user from Google Sheets
+  // Requires authentication: user can only query their own submission count, or admin can query any
+  public shared ({ caller }) func getSubmissionCount(loginId : Text) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view submission counts");
+    };
+
+    // Verify the caller is requesting their own data or is an admin
+    let isAdmin = AccessControl.isAdmin(accessControlState, caller);
+    if (not isAdmin) {
+      switch (userProfiles.get(caller)) {
+        case null {
+          Runtime.trap("Unauthorized: User profile not found");
+        };
+        case (?profile) {
+          if (profile.loginId != loginId) {
+            Runtime.trap("Unauthorized: Can only view your own submission count");
+          };
+        };
+      };
+    };
+
+    await OutCall.httpGetRequest(
+      "https://script.google.com/macros/s/AKfycbzAJ7wor5EMwHzCGrmn7iuk8ncoEinKD24BaP9HibvRHH-jF1w1yoReUZXcTQKkPr96fA/exec?sheetType=statistics&type=entryCount&loginId=" # loginId,
+      [],
+      transform,
+    );
   };
 };

@@ -42,6 +42,24 @@ export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'loginId' : IDL.Text,
 });
+export const http_header = IDL.Record({
+  'value' : IDL.Text,
+  'name' : IDL.Text,
+});
+export const http_request_result = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
+export const TransformationInput = IDL.Record({
+  'context' : IDL.Vec(IDL.Nat8),
+  'response' : http_request_result,
+});
+export const TransformationOutput = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -50,7 +68,9 @@ export const idlService = IDL.Service({
   'getAllSubmissions' : IDL.Func([], [IDL.Vec(FarmerSubmission)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getLeaderboard' : IDL.Func([], [IDL.Text], []),
   'getSubmission' : IDL.Func([IDL.Nat], [IDL.Opt(FarmerSubmission)], ['query']),
+  'getSubmissionCount' : IDL.Func([IDL.Text], [IDL.Text], []),
   'getSubmissionsByDevice' : IDL.Func(
       [IDL.Text],
       [IDL.Vec(FarmerSubmission)],
@@ -68,6 +88,11 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'transform' : IDL.Func(
+      [TransformationInput],
+      [TransformationOutput],
+      ['query'],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -104,6 +129,21 @@ export const idlFactory = ({ IDL }) => {
     'guest' : IDL.Null,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text, 'loginId' : IDL.Text });
+  const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const http_request_result = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
+  const TransformationInput = IDL.Record({
+    'context' : IDL.Vec(IDL.Nat8),
+    'response' : http_request_result,
+  });
+  const TransformationOutput = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -112,11 +152,13 @@ export const idlFactory = ({ IDL }) => {
     'getAllSubmissions' : IDL.Func([], [IDL.Vec(FarmerSubmission)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getLeaderboard' : IDL.Func([], [IDL.Text], []),
     'getSubmission' : IDL.Func(
         [IDL.Nat],
         [IDL.Opt(FarmerSubmission)],
         ['query'],
       ),
+    'getSubmissionCount' : IDL.Func([IDL.Text], [IDL.Text], []),
     'getSubmissionsByDevice' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(FarmerSubmission)],
@@ -134,6 +176,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'transform' : IDL.Func(
+        [TransformationInput],
+        [TransformationOutput],
+        ['query'],
+      ),
   });
 };
 
