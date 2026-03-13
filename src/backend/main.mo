@@ -14,13 +14,11 @@ actor {
 
   type UserProfile = {
     name : Text;
-    loginId : Text; // Mobile number or unique identifier from the frontend
+    loginId : Text;
   };
 
-  // In-memory Maps for user profiles and submissions
   let userProfiles = Map.empty<Principal, UserProfile>();
 
-  // User profile management functions (as in original code)
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view profiles");
@@ -42,7 +40,6 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Submission type definition (now includes `selectedSTValue`)
   public type FarmerSubmission = {
     fieldSize : Text;
     deviceId : Text;
@@ -77,10 +74,8 @@ actor {
     rank : Nat;
   };
 
-  // Farmer submission management
   let submissions = Map.empty<Nat, FarmerSubmission>();
 
-  // Add a farmer submission
   public shared ({ caller }) func addSubmission(submissionId : Nat, submission : FarmerSubmission) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can add submissions");
@@ -88,7 +83,6 @@ actor {
     submissions.add(submissionId, submission);
   };
 
-  // Fetch a specific submission by ID
   public query ({ caller }) func getSubmission(submissionId : Nat) : async ?FarmerSubmission {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view submissions");
@@ -96,7 +90,6 @@ actor {
     submissions.get(submissionId);
   };
 
-  // Fetch all submissions as an array
   public query ({ caller }) func getAllSubmissions() : async [FarmerSubmission] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view submissions");
@@ -104,7 +97,6 @@ actor {
     submissions.values().toArray();
   };
 
-  // Fetch submissions by farmer ID
   public query ({ caller }) func getSubmissionsByFarmer(farmerId : Text) : async [FarmerSubmission] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view submissions");
@@ -115,7 +107,6 @@ actor {
     filteredIter.toArray();
   };
 
-  // Fetch submissions by device ID
   public query ({ caller }) func getSubmissionsByDevice(deviceId : Text) : async [FarmerSubmission] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view submissions");
@@ -126,46 +117,15 @@ actor {
     filteredIter.toArray();
   };
 
-  // HTTP transformation callback for GET requests.
-  // Required for compatibility with the HTTP outcall component.
   public query ({}) func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
     OutCall.transform(input);
   };
 
-  // CORS-safe leaderboard retrieval through HTTP outcall component.
-  // Public leaderboard accessible to all users including guests
-  public shared ({ caller }) func getLeaderboard() : async Text {
+  // Fetch leaderboard JSON from the locked Google Apps Script endpoint.
+  // Returns raw JSON string: {"totalSubmissions":N,"leaderboard":[{"loginID":"...","submissions":N}]}
+  public shared func getLeaderboard() : async Text {
     await OutCall.httpGetRequest(
-      "https://script.google.com/macros/s/AKfycbzAJ7wor5EMwHzCGrmn7iuk8ncoEinKD24BaP9HibvRHH-jF1w1yoReUZXcTQKkPr96fA/exec?sheetType=leaderboard",
-      [],
-      transform,
-    );
-  };
-
-  // Outcall to get submission count for a specific user from Google Sheets
-  // Requires authentication: user can only query their own submission count, or admin can query any
-  public shared ({ caller }) func getSubmissionCount(loginId : Text) : async Text {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view submission counts");
-    };
-
-    // Verify the caller is requesting their own data or is an admin
-    let isAdmin = AccessControl.isAdmin(accessControlState, caller);
-    if (not isAdmin) {
-      switch (userProfiles.get(caller)) {
-        case null {
-          Runtime.trap("Unauthorized: User profile not found");
-        };
-        case (?profile) {
-          if (profile.loginId != loginId) {
-            Runtime.trap("Unauthorized: Can only view your own submission count");
-          };
-        };
-      };
-    };
-
-    await OutCall.httpGetRequest(
-      "https://script.google.com/macros/s/AKfycbzAJ7wor5EMwHzCGrmn7iuk8ncoEinKD24BaP9HibvRHH-jF1w1yoReUZXcTQKkPr96fA/exec?sheetType=statistics&type=entryCount&loginId=" # loginId,
+      "https://script.google.com/macros/s/AKfycbzCSJqngZ4pXEcgsnQHN-xsQR14OKTUvg4CBzjcAOesV93MFdC74NPXm_EkiZ5pu_5R/exec",
       [],
       transform,
     );
