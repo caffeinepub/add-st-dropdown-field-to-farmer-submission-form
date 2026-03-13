@@ -13,7 +13,19 @@ import { LogIn } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const ST_OPTIONS = ["Ahilyanagar", "Pune", "Nashik", "Solapur", "Sangli"];
+const ST_OPTIONS = [
+  "Ahilyanagar",
+  "Pune",
+  "Nashik",
+  "Solapur",
+  "Sangli",
+  "Jalgaon",
+  "Nagpur",
+  "Nanded",
+  "Sambhajinagar",
+  "Yavatmal",
+  "Akola",
+];
 
 const MGO_HEADQUARTERS_MAP: Record<string, string[]> = {
   Ahilyanagar: ["Shrigondha", "Tisgaon", "Shrirampur", "Shevgaon"],
@@ -21,6 +33,12 @@ const MGO_HEADQUARTERS_MAP: Record<string, string[]> = {
   Nashik: ["Chandwad", "Pimplegaon", "Ozar", "Niphad"],
   Solapur: ["Malshiras", "Jeur", "Sangola"],
   Sangli: ["Kawthemahakal"],
+  Jalgaon: ["Pachora", "Jalgaon", "Raver"],
+  Nagpur: ["Nagpur", "Wardha", "Pulgaon"],
+  Nanded: ["Basmat", "Ardhapur", "Sengaon", "Kalamnuri"],
+  Sambhajinagar: ["Vaijapur", "Jalna", "Kannad", "Sillod"],
+  Yavatmal: ["Mahagaon", "Pusad", "Yavatmal", "Darwha"],
+  Akola: ["Morshi", "Karanja Lad", "Akot", "Amravati", "Achalpur"],
 };
 
 interface LoginPageProps {
